@@ -28,7 +28,7 @@ This directory contains pre-generated network presets using QuadMeshNetworkPrese
 
 # QuadMeshNetworkScript.wl:
 
-This is the main algorithm script - it models each tube as a quadrilateral mesh and seeks the lowest energy state by adjusting vertex coordinates, tube lengths, and local mesh geometry. Here is a breakdown of the workflow: 
+This is the main algorithm script - it provides all functions that will be used to model each tube as a quadrilateral mesh and seeks the lowest energy state by adjusting vertex coordinates, tube lengths, and local mesh geometry. These functions will be called and used in QuadMeshNetwork_trifur_script.nb and QuadMeshNetwork_bimodal_script.nb. Here is a breakdown of the workflow of these functions: 
 
 ## Workflow:
 
