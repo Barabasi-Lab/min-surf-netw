@@ -1,25 +1,104 @@
-# min-surf-netw
+# Overview
 
-QuadMeshNetworkPreset.nb:
+This Mathematica framework constructs and optimizes the geometry of complex network manifolds. It models a physical network as a continuous surface manifold composed of cylindrical tubes (edges) that meet at polygonal junctions (vertices).
 
-This script sets up the topological and geometric characteristics for a physical network, including lists of nodes, links, their connectivities, and "sewing" information (e.g., which side and polarity of a sleeve boundary for each link is sewn to other links). The code can automatically generate this information for a spatially embedded network (provided by a .swc file). The outputs are saved as .mx files in the preset/ directory.
+Using Mathematica's FEM package, the script finds the network's equilibrium 3D embedding by minimizing a tunable, physically-motivated energy functional. This makes it a powerful tool for research in:
 
-preset/:
+1. Soft Matter & Biophysics: Modeling cytoskeletal networks, protein aggregates, or other physical polymer systems.
+
+2. Materials Science: Simulating the structure of porous materials or foams.
+
+3. Complex Systems: Finding minimal-energy embeddings for abstract networks with physical constraints.
+
+The script models each tube as a quadrilateral mesh and seeks the lowest energy state by adjusting vertex coordinates, tube lengths, and local mesh geometry.
+
+## Prerequisites & Dependencies
+
+Mathematica: Version 12.0 or newer. The code only relies on the built-in NDSolveFEM`` package of Mathematica.
+
+
+
+# QuadMeshNetworkPreset.nb:
+
+This script sets up the topological and geometric characteristics for a physical network, including lists of nodes, links, their connectivities, and "stitching" information (e.g., which side and polarity of a sleeve boundary for each link is stitched to other links). The code can automatically generate this information for a spatially embedded network (provided by a .swc file). The outputs are saved as .mx files in the preset/ directory.
+
+# preset/:
 
 This directory contains pre-generated network presets using QuadMeshNetworkPreset.nb. These presets are used in other scripts, such as QuadMeshNetwork_trifur_script.nb.
 
-QuadMeshNetworkScript.wl:
+# QuadMeshNetworkScript.wl:
 
-This file includes all the necessary functions for building the QuadMesh and running the surface minimization.
+This is the main algorithm script - it models each tube as a quadrilateral mesh and seeks the lowest energy state by adjusting vertex coordinates, tube lengths, and local mesh geometry. Here is a breakdown of the workflow: 
 
-QuadMeshNetwork_trifur_script.nb:
+## Workflow:
+
+Run the script in the following sequence after executing your preset[].
+
+### Step 1: setupFEM[globalScale]
+
+Generates a quad-meshed cylinder for each network edge.
+
+    globalScale: Controls mesh resolution (smaller value = higher resolution).
+
+    Defines Subscript[sqrtZScale, edgeN], the optimizable length scale for each tube.
+
+### Step 2: doAttribute[]
+
+Calculates detailed geometric attributes, defining vertex polygon shapes and creating Interpolation functions (edgePathInterpolationList, edgePathInterpolationRotationList) to serve as guide paths for the tubes.
+
+### Step 3: doConstraint[]
+
+Builds the symbolic energy functional (constraintsAll) by combining all physical components into a single expression for minimization.
+
+### Step 4: doInitialize[edgedλList, edgeSqrtZScaleList]
+
+Generates a high-quality initial 3D embedding by placing the mesh coordinates along the interpolated guide paths, providing an excellent starting point for the optimizer.
+
+    edgedλList: Initial values for the conformal factors dλ.
+
+    edgeSqrtZScaleList: Initial values for the tube length scale factors.
+
+### Step 5: doFindMinimum[wfair, maxIterations, ...]
+
+The main solver. Calls FindMinimum to find the coordinates and parameters that minimize the constraintsAll energy functional.
+
+    wfair0: Initial weight for bending energy (fairness).
+
+    maxIterations: Max iterations for the solver.
+
+    wSurface: Weight for surface area minimization.
+
+    wCircle: Weight to enforce circular shapes at network terminals.
+
+    wPathPerFair: Weight forcing tubes to adhere to their guide paths.
+
+    wIso: Weight for the local isometry/conformality constraint.
+
+### Step 6 (Optional): doChangeMode[...]
+
+A utility to modify the physical model without redefining constraints.
+
+    confλ -> False: Enforces a stricter isometric model.
+
+    zScale -> False: Uses fixed-length tubes.
+
+## Interpreting the Output
+
+The primary output is the findMinimumAll variable, which contains:
+
+    findMinimumAll[[1]]: The final, minimized value of the energy functional.
+
+    findMinimumAll[[2]]: A list of replacement rules (var -> value) with the optimized numerical values for all symbolic variables (coordinates, dλ, sqrtZScale).
+
+
+# QuadMeshNetwork_trifur_script.nb:
 
 This script runs surface minimization for a trifurcation configuration. Execute the script line by line.
 
-QuadMeshNetwork_bimodal_script.nb:
+# QuadMeshNetwork_bimodal_script.nb:
 
 This script runs surface minimization for a bimodal-bifurcation configuration (i.e., bifurcation of two different link thicknesses). Execute the script line by line.
 
-dλ/:
+# d[Lambda]/:
 
 This directory contains the output files generated by QuadMeshNetwork_trifur_script.nb and QuadMeshNetwork_bimodal_script.nb.
