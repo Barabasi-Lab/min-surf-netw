@@ -20,7 +20,7 @@ Mathematica: Version 12.0 or newer. The code only relies on the built-in NDSolve
 
 # QuadMeshNetworkPreset.nb:
 
-This script sets up the topological and geometric characteristics for a physical network, including lists of nodes, links, their connectivities, and "stitching" information (e.g., which side and polarity of a sleeve boundary for each link is stitched to other links). The code can automatically generate this information for a spatially embedded network (provided by a .swc file). The outputs are saved as .mx files in the preset/ directory.
+This script sets up the topological and geometric characteristics for a physical network, including lists of nodes, links, their connectivities, and "stitching" information (e.g., which side and polarity of a sleeve boundary for each link is stitched to other links). The code can also automatically generate this information for a spatially embedded network (provided by a .swc file). The outputs are saved as .mx files in the preset/ directory.
 
 # preset/:
 
